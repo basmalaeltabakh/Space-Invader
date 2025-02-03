@@ -15,7 +15,7 @@ The "Space Invader" game is an exciting shooting game where the player controls 
    - Each enemy hit increases the player's score.
    - The score is displayed at the top left of the screen.
    - The game ends when enemies reach the bottom.
-   - If you reach a score of 30, you win the game!
+   - If you reach a score of 20, you win the game!
 
 ## Technologies Used
 - Python
