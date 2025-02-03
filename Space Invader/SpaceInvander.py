@@ -3,25 +3,25 @@ import random
 import pygame
 from pygame import mixer
 
-# تهيئة Pygame
+#initialize PyGame
 pygame.init()
 
-# إعداد الشاشة
+# create the screen
 screen = pygame.display.set_mode((800, 600))
 
-# تحميل الخلفية
+# Background
 background = pygame.image.load('background.jpg')
 
-# تشغيل الصوت
+# Sound
 mixer.music.load("background.wav")
 mixer.music.play(-1)
 
-# إعداد الأيقونة والعنوان
+# Caption and Icon
 pygame.display.set_caption("Space Invader")
 icon = pygame.image.load('shuttle.png')
 pygame.display.set_icon(icon)
 
-# اللاعب
+# Player
 playerImg = pygame.image.load('space.png')
 playerX = 370
 playerY = 480
@@ -30,7 +30,7 @@ acceleration = 0.2
 max_speed = 5  
 friction = 0.1  
 
-# الأعداء
+# Enemy
 enemyImg = []
 enemyX = []
 enemyY = []
@@ -45,7 +45,10 @@ for i in range(num_of_enemies):
     enemyX_change.append(0.5)  
     enemyY_change.append(10)   
 
-# الرصاصة
+# Bullet
+
+# Ready - You can't see the bullet on the screen
+# Fire - The bullet is currently moving
 bulletImg = pygame.image.load('bullet.png')
 bulletImg = pygame.transform.scale(bulletImg, (10, 20))  
 bulletX = 0
@@ -53,19 +56,21 @@ bulletY = playerY
 bulletY_change = 10  
 bullet_state = "ready"  
 
-# إعداد الخطوط والنقاط
+# Score
 score_value = 0
 font = pygame.font.Font('freesansbold.ttf', 32)
 textX = 10
 textY = 10
 
-# نص نهاية اللعبة والفوز
+# Game Over
 over_font = pygame.font.Font('freesansbold.ttf', 64)
+
+# Winning
 win_font = pygame.font.Font('freesansbold.ttf', 64)
 
 def show_score(x, y):
     global score_value
-    if score_value >= 30:
+    if score_value >= 20:
         win_text = win_font.render("YOU WIN!", True, (0, 255, 0))
         screen.blit(win_text, (250, 250))
     else:
@@ -91,18 +96,21 @@ def isCollision(enemyX, enemyY, bulletX, bulletY):
     distance = math.sqrt(math.pow(enemyX - bulletX, 2) + math.pow(enemyY - bulletY, 2))
     return distance < 27
 
-# 🔥 حلقة اللعبة الرئيسية
+# Game Loop
 running = True
 while running:
+
+    # RGB = Red, Green, Blue
     screen.fill((0, 0, 0))
+
+    # Background Image
     screen.blit(background, (0, 0))
 
-    # التقاط الأحداث
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
 
-        # إطلاق الرصاصة عند الضغط على المسافة
+       # if keystroke is pressed check whether its right or left
         if event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE:
             if bullet_state == "ready":
                 bulletSound = mixer.Sound("laser.wav")
@@ -110,7 +118,7 @@ while running:
                 bulletX = playerX
                 fire_bullet(bulletX, bulletY)
 
-    # قراءة المفاتيح لتحريك اللاعب
+    
     keys = pygame.key.get_pressed()
     if keys[pygame.K_LEFT]:
         player_speed -= acceleration  
@@ -122,15 +130,15 @@ while running:
         elif player_speed < 0:
             player_speed += friction  
 
-    # منع تجاوز السرعة القصوى
+
     player_speed = max(-max_speed, min(player_speed, max_speed))
 
-    # تحريك اللاعب
+    # player movement
     playerX += player_speed
     playerX = max(0, min(playerX, 736))  
 
-    # إذا وصل اللاعب إلى 30 نقطة، يتم إيقاف الأعداء وعرض رسالة الفوز
-    if score_value < 30:
+    
+    if score_value < 20:
         for i in range(num_of_enemies):
             if enemyY[i] > 440:
                 for j in range(num_of_enemies):
@@ -146,7 +154,7 @@ while running:
                 enemyX_change[i] = -0.5  
                 enemyY[i] += enemyY_change[i]
 
-            # التحقق من التصادم
+            # Collision
             if isCollision(enemyX[i], enemyY[i], bulletX, bulletY):
                 explosionSound = mixer.Sound("explosion.wav")
                 explosionSound.play()
@@ -158,7 +166,7 @@ while running:
 
             enemy(enemyX[i], enemyY[i], i)
 
-    # تحريك الرصاصة
+    # Bullet Movement
     if bullet_state == "fire":
         fire_bullet(bulletX, bulletY)
         bulletY -= bulletY_change  
@@ -166,7 +174,8 @@ while running:
             bulletY = playerY
             bullet_state = "ready"  
 
-    # عرض اللاعب والنقاط
+    
     player(playerX, playerY)
     show_score(textX, textY)
     pygame.display.update()
+
